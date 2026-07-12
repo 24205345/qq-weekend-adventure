@@ -41,7 +41,7 @@ type Activity = {
   icon: LucideIcon;
 };
 
-const FRIDAY_SLOTS = ["20:00", "20:30", "21:00", "21:30"];
+const FRIDAY_SLOTS = ["21:00", "21:30", "22:00", "22:30", "23:00"];
 const WEEKEND_SLOTS = ["10:30", "13:00", "15:30", "18:00", "20:30"];
 
 const activities: Activity[] = [
@@ -275,7 +275,7 @@ export default function Home() {
                 <Sparkles size={26} />
               </span>
               <p className="eyebrow">一封只在周末生效的邀请</p>
-              <h1>你愿意和 QQ 一起去约会吗？</h1>
+              <h1 className="opening-question">你愿意周末和QQ一起出去玩耍吗？</h1>
               <p className="opening-copy">穿过小门以后，有一段时间正等着被我们共同填满。</p>
 
               <div className="choice-arena">

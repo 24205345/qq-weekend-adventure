@@ -1,4 +1,4 @@
-const FRIDAY_SLOTS = new Set(["20:00", "20:30", "21:00", "21:30"]);
+const FRIDAY_SLOTS = new Set(["21:00", "21:30", "22:00", "22:30", "23:00"]);
 const WEEKEND_SLOTS = new Set(["10:30", "13:00", "15:30", "18:00", "20:30"]);
 const ACTIVITIES = new Set(["movie", "meal", "exhibition", "drinks", "surprise", "other"]);
 const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL;
