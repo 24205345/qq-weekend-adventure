@@ -1,0 +1,851 @@
+@import "tailwindcss";
+
+:root {
+  --ivory: #fffaf0;
+  --paper: rgba(255, 252, 244, 0.95);
+  --ink: #24342d;
+  --muted: #68736d;
+  --raspberry: #a43f55;
+  --raspberry-dark: #7f2e40;
+  --powder-blue: #547d9a;
+  --leaf: #50705a;
+  --gold: #b98b31;
+  --line: rgba(60, 67, 58, 0.2);
+  --shadow: rgba(25, 32, 27, 0.24);
+}
+
+@theme inline {
+  --color-background: var(--ivory);
+  --color-foreground: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: #26382f;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+textarea {
+  font: inherit;
+  letter-spacing: 0;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(84, 125, 154, 0.42);
+  outline-offset: 2px;
+}
+
+.wonderland-shell {
+  min-height: 100svh;
+  position: relative;
+  overflow-x: hidden;
+  background-image: url("/wonderland-garden.png");
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+}
+
+.wonderland-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 31, 26, 0.22);
+  pointer-events: none;
+}
+
+.storybook-stage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 720px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+.site-header {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #fffdf6;
+  text-shadow: 0 1px 12px rgba(21, 28, 24, 0.75);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.brand-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(255, 253, 246, 0.65);
+  border-radius: 50%;
+  background: rgba(40, 52, 45, 0.38);
+}
+
+.progress {
+  width: 70px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.progress-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+}
+
+.progress-dot.active {
+  background: #fff5c8;
+  border-color: #fff5c8;
+  box-shadow: 0 0 0 3px rgba(255, 245, 200, 0.16);
+}
+
+.paper-sheet {
+  width: 100%;
+  margin: auto 0;
+  padding: 24px 20px 22px;
+  border: 1px solid rgba(114, 92, 49, 0.28);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 22px 65px var(--shadow), inset 0 0 45px rgba(190, 148, 74, 0.06);
+  backdrop-filter: blur(9px);
+}
+
+.invitation-opening {
+  min-height: min(610px, calc(100svh - 92px));
+  display: grid;
+  place-items: center;
+}
+
+.opening-content,
+.gentle-exit {
+  width: min(100%, 520px);
+  text-align: center;
+}
+
+.ornament {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  border: 1px solid rgba(185, 139, 49, 0.48);
+  border-radius: 50%;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--raspberry);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "STKaiti", "KaiTi", "Songti SC", Georgia, serif;
+  letter-spacing: 0;
+}
+
+h1 {
+  max-width: 470px;
+  margin: 0 auto;
+  font-size: clamp(34px, 9vw, 54px);
+  line-height: 1.18;
+  font-weight: 700;
+}
+
+h2 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.28;
+}
+
+.opening-copy {
+  max-width: 440px;
+  margin: 20px auto 0;
+  color: #526159;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.choice-arena {
+  width: 100%;
+  min-height: 108px;
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+}
+
+.primary-button,
+.secondary-button,
+.time-option,
+.invitation-actions button {
+  min-height: 46px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 126px;
+  padding: 0 18px;
+  border: 1px solid var(--raspberry-dark);
+  background: var(--raspberry);
+  color: #fffdf8;
+  font-weight: 800;
+  box-shadow: 0 7px 18px rgba(127, 46, 64, 0.2);
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--raspberry-dark);
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.secondary-button {
+  min-width: 116px;
+  padding: 0 16px;
+  border: 1px solid rgba(60, 67, 58, 0.34);
+  background: rgba(255, 255, 255, 0.68);
+  color: #445149;
+  font-weight: 700;
+}
+
+.tiny-note,
+.delivery-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.gentle-exit .primary-button {
+  margin-top: 28px;
+}
+
+.step-content,
+.success-content {
+  width: min(100%, 610px);
+  margin: 0 auto;
+}
+
+.step-heading,
+.success-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.success-heading > svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--raspberry);
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: #fff;
+}
+
+.calendar-wrap {
+  width: 100%;
+  padding: 12px 8px 10px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.rdp-root {
+  --rdp-accent-color: var(--raspberry);
+  --rdp-accent-background-color: rgba(164, 63, 85, 0.13);
+  --rdp-day-height: 42px;
+  --rdp-day-width: 42px;
+  width: 100%;
+  margin: 0;
+}
+
+.rdp-months,
+.rdp-month {
+  width: 100%;
+  max-width: none;
+}
+
+.rdp-month_grid {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.rdp-month_caption {
+  min-height: 42px;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 19px;
+}
+
+.rdp-weekday {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rdp-day_button {
+  width: 38px;
+  height: 38px;
+  margin: auto;
+  border-radius: 50%;
+  font-size: 13px;
+}
+
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--powder-blue);
+  border: 1px solid rgba(84, 125, 154, 0.4);
+}
+
+.rdp-disabled {
+  opacity: 0.26;
+  text-decoration: line-through;
+}
+
+.rdp-selected .rdp-day_button {
+  color: #fff;
+  background: var(--raspberry);
+  border-color: var(--raspberry);
+  font-weight: 800;
+}
+
+.rdp-chevron {
+  fill: var(--leaf);
+}
+
+.calendar-legend {
+  min-height: 24px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-open {
+  background: var(--raspberry);
+}
+
+.legend-work {
+  background: #a9aaa4;
+}
+
+.time-section {
+  min-height: 116px;
+  padding: 18px 0 8px;
+}
+
+.time-heading {
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--leaf);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.time-option {
+  min-width: 0;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.time-option.selected {
+  border-color: var(--powder-blue);
+  background: var(--powder-blue);
+  color: #fff;
+}
+
+.wide-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.activity-option {
+  position: relative;
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+}
+
+.activity-option:hover,
+.activity-option.selected {
+  border-color: rgba(164, 63, 85, 0.62);
+  background: rgba(255, 245, 241, 0.92);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(84, 125, 154, 0.13);
+  color: var(--powder-blue);
+}
+
+.activity-option strong,
+.activity-option small {
+  display: block;
+}
+
+.activity-option strong {
+  padding-right: 18px;
+  font-size: 14px;
+}
+
+.activity-option small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.activity-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--raspberry);
+}
+
+.field-label {
+  display: block;
+  margin-top: 16px;
+}
+
+.field-label > span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.field-label small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.field-label textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.booking-summary {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.booking-summary > div {
+  min-height: 66px;
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 11px 4px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.booking-summary > div:last-child {
+  border-bottom: 0;
+}
+
+.booking-summary span,
+.invite-details span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.booking-summary strong {
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.error-message {
+  margin: 14px 0 0;
+  color: var(--raspberry-dark);
+  font-size: 12px;
+  text-align: center;
+}
+
+.seal-button {
+  margin-top: 22px;
+}
+
+.spin {
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-content {
+  padding-top: 2px;
+}
+
+.invitation-card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid rgba(108, 83, 36, 0.5);
+  border-radius: 4px;
+  background: #fffaf0;
+  box-shadow: inset 0 0 0 5px #fffaf0, inset 0 0 0 6px rgba(185, 139, 49, 0.32);
+}
+
+.invitation-card::before,
+.invitation-card::after {
+  content: "";
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  border: 1px solid rgba(164, 63, 85, 0.25);
+  border-radius: 50%;
+}
+
+.invitation-card::before {
+  top: -46px;
+  left: -38px;
+}
+
+.invitation-card::after {
+  right: -38px;
+  bottom: -46px;
+}
+
+.invite-card-topline,
+.invite-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--leaf);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.invite-card-topline {
+  justify-content: flex-start;
+}
+
+.invite-kicker {
+  margin: 27px 0 4px;
+  color: var(--raspberry);
+  font-size: 9px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.invitation-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 34px;
+  text-align: center;
+}
+
+.invite-message {
+  max-width: 400px;
+  margin: 10px auto 22px;
+  color: #59665f;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.invite-details {
+  display: grid;
+  grid-template-columns: 1.35fr 0.7fr 1fr;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.invite-details > div {
+  min-width: 0;
+  padding: 13px 9px;
+  border-right: 1px solid var(--line);
+}
+
+.invite-details > div:last-child {
+  border-right: 0;
+}
+
+.invite-details strong {
+  display: block;
+  margin-top: 5px;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.invite-note {
+  margin: 16px 0 0;
+  color: var(--raspberry-dark);
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.invite-footer {
+  margin-top: 22px;
+  color: var(--muted);
+}
+
+.invitation-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.invitation-actions button {
+  min-width: 0;
+  padding: 8px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.invitation-actions button:hover {
+  border-color: var(--powder-blue);
+  color: var(--powder-blue);
+}
+
+.delivery-note {
+  margin-top: 12px;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .storybook-stage {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .site-header {
+    padding: 0 14px;
+  }
+
+  .paper-sheet {
+    margin-bottom: 0;
+    padding: 22px 16px max(20px, env(safe-area-inset-bottom));
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .invitation-opening {
+    min-height: calc(100svh - 62px);
+  }
+
+  h1 {
+    font-size: clamp(34px, 11vw, 45px);
+  }
+
+  h2 {
+    font-size: 23px;
+  }
+
+  .choice-arena {
+    gap: 9px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-width: 116px;
+  }
+
+  .calendar-wrap {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .rdp-day_button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .time-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .activity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-option {
+    min-height: 76px;
+  }
+
+  .invite-details {
+    grid-template-columns: 1.2fr 0.75fr 1fr;
+  }
+
+  .invite-details > div {
+    padding: 12px 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand-lockup {
+    font-size: 12px;
+  }
+
+  .choice-arena {
+    min-height: 140px;
+    flex-direction: column;
+  }
+
+  .time-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .invitation-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .invitation-actions button {
+    min-height: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
