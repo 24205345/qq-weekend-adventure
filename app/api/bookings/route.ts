@@ -69,17 +69,20 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, message: "通知邮箱尚未配置" }, { status: 503 });
   }
 
+  const sourceUrl = request.headers.get("origin") || new URL(request.url).origin;
   const formEndpoint = `https://formsubmit.co/ajax/${encodeURIComponent(notifyEmail)}`;
   const formResponse = await fetch(formEndpoint, {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      Origin: sourceUrl,
+      Referer: `${sourceUrl}/`,
     },
     body: JSON.stringify({
       _subject: `新的周末约会预约｜${date} ${time}`,
       _template: "table",
-      _url: request.headers.get("origin") || "QQ 周末小冒险",
+      _url: sourceUrl,
       预约编号: bookingId,
       预约日期: date,
       预约时间: time,
@@ -93,9 +96,18 @@ export async function POST(request: Request) {
     }),
   });
 
-  if (!formResponse.ok) {
+  const formResult = (await formResponse.json().catch(() => null)) as {
+    success?: string | boolean;
+    message?: string;
+  } | null;
+  const needsActivation =
+    formResponse.ok &&
+    String(formResult?.success) === "false" &&
+    Boolean(formResult?.message?.toLowerCase().includes("activation"));
+
+  if (!formResponse.ok || (String(formResult?.success) === "false" && !needsActivation)) {
     return Response.json({ ok: false, message: "通知暂时没有送达" }, { status: 502 });
   }
 
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, activationRequired: needsActivation });
 }
