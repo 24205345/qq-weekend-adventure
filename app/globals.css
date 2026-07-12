@@ -544,16 +544,35 @@ h2 {
   font-weight: 400;
 }
 
+.field-label input,
 .field-label textarea {
   width: 100%;
-  min-height: 76px;
-  resize: vertical;
   padding: 11px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.72);
   color: var(--ink);
   line-height: 1.55;
+}
+
+.field-label input {
+  min-height: 46px;
+}
+
+.field-label input:focus,
+.field-label textarea:focus {
+  outline: 2px solid rgba(84, 125, 154, 0.2);
+  border-color: var(--powder-blue);
+}
+
+.field-label textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.applicant-field {
+  margin-top: 0;
+  margin-bottom: 16px;
 }
 
 .booking-summary {
@@ -680,6 +699,15 @@ h2 {
   font-family: "STKaiti", "KaiTi", serif;
   font-size: 14px;
   line-height: 1.7;
+  text-align: center;
+}
+
+.invite-applicant {
+  margin: -10px 0 16px;
+  color: var(--raspberry-dark);
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 14px;
+  font-weight: 700;
   text-align: center;
 }
 

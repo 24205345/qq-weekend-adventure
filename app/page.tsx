@@ -115,6 +115,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [activityId, setActivityId] = useState<ActivityId | null>(null);
+  const [applicantName, setApplicantName] = useState("");
   const [otherPlan, setOtherPlan] = useState("");
   const [note, setNote] = useState("");
   const [bookingId, setBookingId] = useState("");
@@ -160,7 +161,7 @@ export default function Home() {
   }
 
   async function submitBooking() {
-    if (!selectedDate || !selectedTime || !activityId || !activityLabel) return;
+    if (!selectedDate || !selectedTime || !activityId || !activityLabel || !applicantName.trim()) return;
 
     const nextBookingId =
       bookingId ||
@@ -178,10 +179,11 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          _subject: `新的周末约会预约｜${format(selectedDate, "yyyy-MM-dd")} ${selectedTime}`,
+          _subject: `${applicantName.trim()} 发来新的周末约会预约｜${format(selectedDate, "yyyy-MM-dd")} ${selectedTime}`,
           _template: "table",
           _url: window.location.origin,
           预约编号: nextBookingId,
+          申请人: applicantName.trim(),
           预约日期: format(selectedDate, "yyyy-MM-dd"),
           预约时间: selectedTime,
           约会计划: activityLabel,
@@ -428,6 +430,18 @@ export default function Home() {
                 </div>
               </div>
 
+              <label className="field-label applicant-field">
+                <span>你的名字或昵称 <small>必填</small></span>
+                <input
+                  type="text"
+                  value={applicantName}
+                  maxLength={24}
+                  autoComplete="nickname"
+                  placeholder="方便 QQ 知道是谁来约我"
+                  onChange={(event) => setApplicantName(event.target.value)}
+                />
+              </label>
+
               <div className="activity-grid">
                 {activities.map((activity) => {
                   const Icon = activity.icon;
@@ -476,7 +490,11 @@ export default function Home() {
               <button
                 className="primary-button wide-button"
                 type="button"
-                disabled={!activityId || (activityId === "other" && !otherPlan.trim())}
+                disabled={
+                  !applicantName.trim() ||
+                  !activityId ||
+                  (activityId === "other" && !otherPlan.trim())
+                }
                 onClick={() => setStep(3)}
               >
                 看看预约单
@@ -498,6 +516,10 @@ export default function Home() {
               </div>
 
               <div className="booking-summary">
+                <div>
+                  <span>申请人</span>
+                  <strong>{applicantName}</strong>
+                </div>
                 <div>
                   <span>日期</span>
                   <strong>{dateLabel}</strong>
@@ -550,6 +572,7 @@ export default function Home() {
                 <p className="invite-kicker">A VERY IMPORTANT DATE</p>
                 <h3>约会邀请函</h3>
                 <p className="invite-message">很高兴即将和你一起出去玩，请带上一点期待准时出现。</p>
+                <p className="invite-applicant">预约人 · {applicantName}</p>
                 <div className="invite-details">
                   <div>
                     <span>日期</span>
