@@ -1,7 +1,8 @@
+import { env } from "cloudflare:workers";
+
 const FRIDAY_SLOTS = new Set(["21:00", "21:30", "22:00", "22:30", "23:00"]);
 const WEEKEND_SLOTS = new Set(["10:30", "13:00", "15:30", "18:00", "20:30"]);
 const ACTIVITIES = new Set(["movie", "meal", "exhibition", "drinks", "surprise", "other"]);
-const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL;
 
 type BookingPayload = {
   bookingId?: unknown;
@@ -62,11 +63,13 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, message: "请选择开放的时段和活动" }, { status: 400 });
   }
 
-  if (!NOTIFY_EMAIL) {
+  const notifyEmail = (env as unknown as { NOTIFY_EMAIL?: string }).NOTIFY_EMAIL;
+
+  if (!notifyEmail) {
     return Response.json({ ok: false, message: "通知邮箱尚未配置" }, { status: 503 });
   }
 
-  const formEndpoint = `https://formsubmit.co/ajax/${encodeURIComponent(NOTIFY_EMAIL)}`;
+  const formEndpoint = `https://formsubmit.co/ajax/${encodeURIComponent(notifyEmail)}`;
   const formResponse = await fetch(formEndpoint, {
     method: "POST",
     headers: {

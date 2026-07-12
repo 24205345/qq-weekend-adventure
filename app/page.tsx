@@ -185,10 +185,13 @@ export default function Home() {
         }),
       });
 
-      if (!response.ok) throw new Error("Booking request failed");
+      const responseBody = (await response.json().catch(() => null)) as { message?: string } | null;
+      if (!response.ok) throw new Error(responseBody?.message || "通知暂时没有送达，请再试一次。");
       setStep(4);
-    } catch {
-      setSubmitError("信鸽暂时迷路了，请再试一次。你的选择都还在。");
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "信鸽暂时迷路了，请再试一次。你的选择都还在。",
+      );
     } finally {
       setIsSubmitting(false);
     }
