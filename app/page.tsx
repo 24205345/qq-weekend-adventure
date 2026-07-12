@@ -171,22 +171,36 @@ export default function Home() {
     setSubmitError("");
 
     try {
-      const response = await fetch("/api/bookings", {
+      const response = await fetch("https://formsubmit.co/ajax/18096095446@163.com", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          bookingId: nextBookingId,
-          date: format(selectedDate, "yyyy-MM-dd"),
-          time: selectedTime,
-          activity: activityId,
-          activityLabel,
-          note: note.trim(),
-          website: "",
+          _subject: `新的周末约会预约｜${format(selectedDate, "yyyy-MM-dd")} ${selectedTime}`,
+          _template: "table",
+          _url: window.location.origin,
+          预约编号: nextBookingId,
+          预约日期: format(selectedDate, "yyyy-MM-dd"),
+          预约时间: selectedTime,
+          约会计划: activityLabel,
+          悄悄话: note.trim() || "没有留言",
         }),
       });
 
-      const responseBody = (await response.json().catch(() => null)) as { message?: string } | null;
-      if (!response.ok) throw new Error(responseBody?.message || "通知暂时没有送达，请再试一次。");
+      const responseBody = (await response.json().catch(() => null)) as {
+        success?: string | boolean;
+        message?: string;
+      } | null;
+      const needsActivation =
+        response.ok &&
+        String(responseBody?.success) === "false" &&
+        Boolean(responseBody?.message?.toLowerCase().includes("activation"));
+
+      if (!response.ok || (String(responseBody?.success) === "false" && !needsActivation)) {
+        throw new Error("通知暂时没有送达，请再试一次。");
+      }
       setStep(4);
     } catch (error) {
       setSubmitError(
