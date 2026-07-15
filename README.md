@@ -1,98 +1,47 @@
-# vinext-starter
+# 和 QQ 的周末小冒险
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+一个面向手机端的可爱童话风约会预约网站。访客可以接受邀请、选择周末日期和时间、填写名字或昵称、挑选活动，最后生成一张约会邀请函；QQ 会通过邮件收到同一份预约信息。
 
-## Prerequisites
+- 线上地址：https://qq-weekend-adventure.qianqianwang1099.chatgpt.site
+- GitHub 仓库：https://github.com/24205345/qq-weekend-adventure
+- 当前状态：公开访问，持续维护
 
-- Node.js `>=22.13.0`
+## 已实现功能
 
-## Quick Start
+- 爱丽丝梦游仙境式的复古童话视觉与手机端布局
+- 会躲开的“暂时不愿意”按钮，尝试三次后仍允许访客正常拒绝
+- 只开放周五晚上和周六、周日的日期选择
+- 周五开放 `21:00`、`21:30`、`22:00`、`22:30`、`23:00`
+- 周末开放 `10:30`、`13:00`、`15:30`、`18:00`、`20:30`
+- 申请人名字或昵称必填
+- 电影、吃饭、看展、小酌、交给 QQ 和自定义计划
+- 可选悄悄话、提交前核对页和邮件通知
+- 可保存邀请函图片、加入系统日历和分享邀请
+
+## 文档
+
+- [产品说明](docs/product-spec.md)：目标、完整流程、规则、文案和后续方向
+- [维护手册](docs/maintenance.md)：技术结构、邮件、开发、测试与发布方式
+
+## 本地运行
+
+需要 Node.js `>=22.13.0`。
 
 ```bash
 npm install
 npm run dev
+```
+
+常用命令：
+
+```bash
 npm run build
+npm test
+npm run lint
 ```
 
-This starter does not use `wrangler.jsonc`.
+核心页面位于 `app/page.tsx`，视觉样式位于 `app/globals.css`，背景和分享图片位于 `public/`。
 
-## Included Shape
+## 当前边界
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+这是一个轻量邀请工具，不是完整预约系统。目前不保存预约数据库，也没有后台管理、时间冲突检查或取消预约功能。预约结果以访客生成的邀请函和 QQ 收到的邮件为准。
