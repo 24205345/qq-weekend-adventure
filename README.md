@@ -21,6 +21,7 @@
 ## 文档
 
 - [产品说明](docs/product-spec.md)：目标、完整流程、规则、文案和后续方向
+- [商业化平台需求文档](docs/commercial-platform-prd.md)：多商户预约 SaaS 的完整产品需求与分期范围
 - [维护手册](docs/maintenance.md)：技术结构、邮件、开发、测试与发布方式
 
 ## 本地运行
