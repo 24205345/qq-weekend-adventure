@@ -122,6 +122,7 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [shareLabel, setShareLabel] = useState("分享");
+  const bookingRequestId = useRef("");
   const invitationRef = useRef<HTMLDivElement>(null);
   const firstAvailableDate = useMemo(() => getNextAvailableDate(), []);
   const lastAvailableDate = useMemo(() => addDays(firstAvailableDate, 70), [firstAvailableDate]);
@@ -163,45 +164,55 @@ export default function Home() {
   async function submitBooking() {
     if (!selectedDate || !selectedTime || !activityId || !activityLabel || !applicantName.trim()) return;
 
-    const nextBookingId =
-      bookingId ||
-      `QQ-${format(selectedDate, "yyyyMMdd")}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    setBookingId(nextBookingId);
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/18096095446@163.com", {
+      if (!bookingRequestId.current) bookingRequestId.current = crypto.randomUUID();
+      const bookingResponse = await fetch("/api/public/tenants/qq-weekend/bookings", {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          _subject: `${applicantName.trim()} 发来新的周末约会预约｜${format(selectedDate, "yyyy-MM-dd")} ${selectedTime}`,
-          _template: "table",
-          _url: window.location.origin,
-          预约编号: nextBookingId,
-          申请人: applicantName.trim(),
-          预约日期: format(selectedDate, "yyyy-MM-dd"),
-          预约时间: selectedTime,
-          约会计划: activityLabel,
-          悄悄话: note.trim() || "没有留言",
+          serviceId: "service_qq_weekend",
+          storeId: "store_qq_main",
+          date: format(selectedDate, "yyyy-MM-dd"),
+          startTime: selectedTime,
+          customerName: applicantName.trim(),
+          partySize: 1,
+          customerNote: note.trim(),
+          customData: { plan: activityLabel },
+          idempotencyKey: bookingRequestId.current,
+          source: "wonderland_template",
         }),
       });
+      const bookingBody = (await bookingResponse.json()) as {
+        booking?: { code: string };
+        notification?: { status: string };
+        error?: string;
+      };
+      if (!bookingResponse.ok || !bookingBody.booking) {
+        throw new Error(bookingBody.error || "预约暂时没有保存成功，请再试一次。");
+      }
+      const nextBookingId = bookingBody.booking.code;
+      setBookingId(nextBookingId);
 
-      const responseBody = (await response.json().catch(() => null)) as {
-        success?: string | boolean;
-        message?: string;
-      } | null;
-      const needsActivation =
-        response.ok &&
-        String(responseBody?.success) === "false" &&
-        Boolean(responseBody?.message?.toLowerCase().includes("activation"));
-
-      if (!response.ok || (String(responseBody?.success) === "false" && !needsActivation)) {
-        throw new Error("通知暂时没有送达，请再试一次。");
+      if (bookingBody.notification?.status === "failed") {
+        const fallbackResponse = await fetch("https://formsubmit.co/ajax/18096095446@163.com", {
+          method: "POST",
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({
+            _subject: `${applicantName.trim()} 发来新的周末约会预约｜${format(selectedDate, "yyyy-MM-dd")} ${selectedTime}`,
+            _template: "table",
+            _url: window.location.origin,
+            预约编号: nextBookingId,
+            申请人: applicantName.trim(),
+            预约日期: format(selectedDate, "yyyy-MM-dd"),
+            预约时间: selectedTime,
+            约会计划: activityLabel,
+            悄悄话: note.trim() || "没有留言",
+          }),
+        });
+        if (!fallbackResponse.ok) throw new Error("预约已保存，但通知暂时没有送达。QQ 可以在后台看到它。");
       }
       setStep(4);
     } catch (error) {

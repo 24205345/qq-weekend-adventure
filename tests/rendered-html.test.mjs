@@ -1,87 +1,59 @@
 import assert from "node:assert/strict";
-import { access, readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const developmentPreviewMeta =
-  /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
-const templateRoot = new URL("../", import.meta.url);
-const previewRoot = new URL("../app/_sites-preview/", import.meta.url);
-
-async function render() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-
-  return worker.fetch(
-    new Request("http://localhost/", {
-      headers: { accept: "text/html" },
-    }),
-    {
-      ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
-    },
-  );
-}
-
-test("server-renders the starter loading skeleton", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-
-  const html = await response.text();
-  assert.match(html, developmentPreviewMeta);
-  assert.match(html, /<title>Your site is taking shape<\/title>/i);
-  assert.match(html, /Codex is working/);
-  assert.match(html, /Your site is taking shape/);
-  assert.match(html, /Codex is building the first version/);
-  assert.match(html, /react-loading-skeleton/);
-  assert.match(html, /role="status"/);
+test("keeps the existing wonderland template as a database-backed booking surface", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /你愿意周末和QQ一起出去玩耍吗/);
+  assert.match(page, /\/api\/public\/tenants\/qq-weekend\/bookings/);
+  assert.match(page, /idempotencyKey/);
+  assert.doesNotMatch(page, /Your site is taking shape|Codex is working|codex-preview/i);
 });
 
-test("keeps the loading skeleton scoped and disposable", async () => {
-  const [preview, css, page, layout, packageJson, files] = await Promise.all([
-    readFile(new URL("SkeletonPreview.tsx", previewRoot), "utf8"),
-    readFile(new URL("preview.css", previewRoot), "utf8"),
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../package.json", import.meta.url), "utf8"),
-    readdir(previewRoot),
+test("provides a reusable public booking route", async () => {
+  const [page, app] = await Promise.all([
+    readFile(new URL("../app/book/[slug]/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/book/[slug]/PublicBookingApp.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /PublicBookingApp/);
+  assert.match(app, /remainingBookings/);
+  assert.match(app, /remainingGuests/);
+  assert.match(app, /加入日历/);
+  assert.match(app, /确认预约/);
+});
+
+test("protects merchant admin surfaces and API routes with server-side identity", async () => {
+  const [page, contextRoute, configRoute, bookingRoute] = await Promise.all([
+    readFile(new URL("../app/admin/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/admin/context/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/admin/config/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/admin/bookings/route.ts", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /requireChatGPTUser\("\/admin"\)/);
+  assert.match(contextRoute, /getChatGPTUser/);
+  assert.match(configRoute, /requireMerchant/);
+  assert.match(bookingRoute, /requireMerchant/);
+});
+
+test("ships the D1 binding and tenant-safe booking migrations", async () => {
+  const [hosting, migration] = await Promise.all([
+    readFile(new URL("../dist/.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../dist/.openai/drizzle/0000_normal_chat.sql", import.meta.url), "utf8"),
   ]);
 
-  assert.deepEqual(files.sort(), ["SkeletonPreview.tsx", "preview.css"]);
-  assert.match(preview, /from "react-loading-skeleton"/);
-  assert.match(preview, /baseColor="#eceae7"/);
-  assert.match(preview, /highlightColor="#f9f8f6"/);
-  assert.match(preview, /duration=\{2\.8\}/);
-  assert.match(preview, /sites-skeleton-search-placeholder/);
-  assert.match(packageJson, /"react-loading-skeleton": "3\.5\.0"/);
+  assert.equal(JSON.parse(hosting).d1, "DB");
+  assert.match(migration, /CREATE TABLE `tenants`/);
+  assert.match(migration, /CREATE TABLE `bookings`/);
+  assert.match(migration, /`tenant_id` text NOT NULL/);
+  assert.match(migration, /bookings_tenant_idempotency_unique/);
+  assert.match(migration, /bookings_slot_idx/);
+  assert.match(migration, /tenant_qq_weekend/);
+});
 
-  const shellIndex = preview.indexOf('className="sites-skeleton-shell"');
-  const statusIndex = preview.indexOf('className="sites-skeleton-status"');
-  assert.ok(shellIndex >= 0 && statusIndex > shellIndex);
-  assert.match(css, /position:\s*fixed/);
-  assert.match(css, /inset:\s*0/);
-  assert.match(css, /opacity:\s*0\.52/);
-  assert.match(css, /prefers-reduced-motion:\s*reduce/);
-  assert.doesNotMatch(css, /#020617|canvas|pets|progress/i);
-  assert.doesNotMatch(
-    preview,
-    /loading-spinner|status-mark|status-progress|canvas|cookie|random/i,
-  );
-
-  assert.match(page, /export const metadata:\s*Metadata/);
-  assert.match(page, /"codex-preview": "development"/);
-  assert.match(page, /<SkeletonPreview \/>/);
-  assert.match(layout, /title:\s*"Starter Project"/);
-  assert.doesNotMatch(layout, /codex-preview|_sites-preview|themeColor|\bViewport\b/);
-  assert.doesNotMatch(css, /(^|\s)(html|body)\s*\{/m);
-
-  await assert.rejects(
-    access(new URL("public/_sites-preview", templateRoot)),
-  );
+test("uses atomic capacity checks before inserting a booking", async () => {
+  const bookingData = await readFile(new URL("../lib/booking-data.ts", import.meta.url), "utf8");
+  assert.match(bookingData, /SELECT COUNT\(\*\) FROM bookings/);
+  assert.match(bookingData, /COALESCE\(SUM\(party_size\), 0\)/);
+  assert.match(bookingData, /status NOT IN \('cancelled', 'expired'\)/);
+  assert.match(bookingData, /这个时段刚刚约满了/);
 });
