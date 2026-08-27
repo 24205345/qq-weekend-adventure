@@ -2,62 +2,49 @@
 
 一个面向手机端的可爱童话风约会预约网站。访客可以接受邀请、选择周末日期和时间、填写名字或昵称、挑选活动，最后生成一张约会邀请函；QQ 会通过邮件收到同一份预约信息。
 
-- 线上地址：https://qq-weekend-adventure.qianqianwang1099.chatgpt.site
+- 旧线上地址（OpenAI Sites，**已不可再发布，勿再依赖**）：https://qq-weekend-adventure.qianqianwang1099.chatgpt.site
 - GitHub 仓库：https://github.com/24205345/qq-weekend-adventure
-- 当前状态：公开访问，持续维护
+- 当前状态：个人邀请站独立维护；多商户 SaaS 已迁到同级目录 `../qq-weekend-adventure-saas`
 
 ## 已实现功能
 
 - 爱丽丝梦游仙境式的复古童话视觉与手机端布局
 - 会躲开的“暂时不愿意”按钮，尝试三次后仍允许访客正常拒绝
 - 只开放周五晚上和周六、周日的日期选择
-- 周五开放 `21:00`、`21:30`、`22:00`、`22:30`、`23:00`
-- 周末开放 `10:30`、`13:00`、`15:30`、`18:00`、`20:30`
-- 申请人名字或昵称必填
-- 电影、吃饭、看展、小酌、交给 QQ 和自定义计划
+- 申请人名字、邮箱与活动选择
 - 可选悄悄话、提交前核对页和邮件通知
+- 轻后台 `/my-admin`：同意/拒绝、关闭档期、邮件反馈预约人
 - 可保存邀请函图片、加入系统日历和分享邀请
 
-## 商业 MVP
+## 项目结构
 
-项目现已包含第一版多商户预约能力：
+| 路径 | 作用 |
+| --- | --- |
+| `/` | 童话邀请页 |
+| `/my-admin` | 个人轻后台 |
+| `/api/personal/*` | 个人预约 API |
+| `lib/personal-*` | 个人业务逻辑 |
+| `docs/personal-light-admin.md` | 轻后台设计 |
 
-- `/admin`：受登录保护的商户管理后台
-- `/book/<商户标识>`：可复用的手机端公开预约页
-- 多商户、成员角色、门店、预约主题和品牌设置
-- 周期开放时间、日期例外、订单容量与人数容量
-- 数据库预约、并发容量校验、幂等提交和安全预约编号
-- 手工录入、改期、确认、签到、完成、取消和爽约管理
-- 商户邮件通知、发送日志、重试与后台操作审计
-
-当前童话页面仍保留在首页，并作为 `qq-weekend` 商户的第一套主题模板接入同一预约数据库。
-
-## 文档
-
-- [产品说明](docs/product-spec.md)：目标、完整流程、规则、文案和后续方向
-- [商业化平台需求文档](docs/commercial-platform-prd.md)：多商户预约 SaaS 的完整产品需求与分期范围
-- [商业 MVP 实施说明](docs/mvp-implementation.md)：本轮实现范围、使用流程和已知边界
-- [维护手册](docs/maintenance.md)：技术结构、邮件、开发、测试与发布方式
+多商户预约 SaaS 已物理迁出，见 **`G:\project\qq-weekend-adventure-saas`**。
 
 ## 本地运行
 
 需要 Node.js `>=22.13.0`。
 
-```bash
-npm install
-npm run dev
-```
-
-常用命令：
+双击 `start-local.bat`，或执行：
 
 ```bash
-npm run build
-npm test
-npm run lint
+npm run local
 ```
 
-核心页面位于 `app/page.tsx`，视觉样式位于 `app/globals.css`，背景和分享图片位于 `public/`。
+默认打开 `http://localhost:3000`。配置见 `env.example`。
 
-## 当前边界
+## 文档
 
-这是一个轻量邀请工具，不是完整预约系统。目前不保存预约数据库，也没有后台管理、时间冲突检查或取消预约功能。预约结果以访客生成的邀请函和 QQ 收到的邮件为准。
+- [架构说明](docs/architecture.md)：目录结构、数据流、与 SaaS 边界
+- [产品说明](docs/product-spec.md)
+- [个人轻后台设计](docs/personal-light-admin.md)
+- [SaaS 迁出说明](docs/saas-migration.md)
+- [本地一键启动](docs/local-start.md)
+- [维护手册](docs/maintenance.md)

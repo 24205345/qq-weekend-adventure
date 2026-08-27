@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { zhCN } from "date-fns/locale";
 import { addDays, format, getDay, startOfDay } from "date-fns";
@@ -25,6 +25,7 @@ import {
   Wine,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { FRIDAY_SLOTS, WEEKEND_SLOTS } from "@/lib/personal-schedule";
 
 type ActivityId =
   | "movie"
@@ -41,8 +42,7 @@ type Activity = {
   icon: LucideIcon;
 };
 
-const FRIDAY_SLOTS = ["21:00", "21:30", "22:00", "22:30", "23:00"];
-const WEEKEND_SLOTS = ["10:30", "13:00", "15:30", "18:00", "20:30"];
+type SlotOption = { time: string; available: boolean; reason?: string };
 
 const activities: Activity[] = [
   {
@@ -116,22 +116,60 @@ export default function Home() {
   const [selectedTime, setSelectedTime] = useState("");
   const [activityId, setActivityId] = useState<ActivityId | null>(null);
   const [applicantName, setApplicantName] = useState("");
+  const [applicantEmail, setApplicantEmail] = useState("");
   const [otherPlan, setOtherPlan] = useState("");
   const [note, setNote] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [shareLabel, setShareLabel] = useState("分享");
-  const bookingRequestId = useRef("");
+  const [slotOptions, setSlotOptions] = useState<SlotOption[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const invitationRef = useRef<HTMLDivElement>(null);
   const firstAvailableDate = useMemo(() => getNextAvailableDate(), []);
   const lastAvailableDate = useMemo(() => addDays(firstAvailableDate, 70), [firstAvailableDate]);
 
-  const slots = getTimeSlots(selectedDate);
   const activityLabel = getActivityLabel(activityId, otherPlan);
   const dateLabel = selectedDate
     ? format(selectedDate, "M 月 d 日 EEEE", { locale: zhCN })
     : "";
+
+  useEffect(() => {
+    if (!selectedDate) {
+      setSlotOptions([]);
+      return;
+    }
+
+    const date = format(selectedDate, "yyyy-MM-dd");
+    let cancelled = false;
+    setSlotsLoading(true);
+
+    (async () => {
+      try {
+        const response = await fetch(`/api/personal/slots?date=${date}`);
+        const body = (await response.json()) as {
+          slots?: SlotOption[];
+          error?: string;
+        };
+        if (!response.ok) throw new Error(body.error || "时段加载失败");
+        if (!cancelled) setSlotOptions(body.slots || []);
+      } catch {
+        if (!cancelled) {
+          const fallback = getTimeSlots(selectedDate).map((time) => ({
+            time,
+            available: true,
+          }));
+          setSlotOptions(fallback);
+        }
+      } finally {
+        if (!cancelled) setSlotsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedDate]);
 
   function dodgeNo(event: React.PointerEvent<HTMLButtonElement>) {
     if (noAttempts >= 3) return;
@@ -162,58 +200,41 @@ export default function Home() {
   }
 
   async function submitBooking() {
-    if (!selectedDate || !selectedTime || !activityId || !activityLabel || !applicantName.trim()) return;
+    if (
+      !selectedDate ||
+      !selectedTime ||
+      !activityId ||
+      !activityLabel ||
+      !applicantName.trim() ||
+      !applicantEmail.trim()
+    ) {
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
-      if (!bookingRequestId.current) bookingRequestId.current = crypto.randomUUID();
-      const bookingResponse = await fetch("/api/public/tenants/qq-weekend/bookings", {
+      const response = await fetch("/api/personal/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          serviceId: "service_qq_weekend",
-          storeId: "store_qq_main",
           date: format(selectedDate, "yyyy-MM-dd"),
           startTime: selectedTime,
-          customerName: applicantName.trim(),
-          partySize: 1,
-          customerNote: note.trim(),
-          customData: { plan: activityLabel },
-          idempotencyKey: bookingRequestId.current,
-          source: "wonderland_template",
+          applicantName: applicantName.trim(),
+          applicantEmail: applicantEmail.trim(),
+          plan: activityLabel,
+          note: note.trim(),
         }),
       });
-      const bookingBody = (await bookingResponse.json()) as {
+      const body = (await response.json()) as {
         booking?: { code: string };
-        notification?: { status: string };
         error?: string;
       };
-      if (!bookingResponse.ok || !bookingBody.booking) {
-        throw new Error(bookingBody.error || "预约暂时没有保存成功，请再试一次。");
+      if (!response.ok || !body.booking) {
+        throw new Error(body.error || "信鸽暂时迷路了，请再试一次。你的选择都还在。");
       }
-      const nextBookingId = bookingBody.booking.code;
-      setBookingId(nextBookingId);
-
-      if (bookingBody.notification?.status === "failed") {
-        const fallbackResponse = await fetch("https://formsubmit.co/ajax/18096095446@163.com", {
-          method: "POST",
-          headers: { Accept: "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({
-            _subject: `${applicantName.trim()} 发来新的周末约会预约｜${format(selectedDate, "yyyy-MM-dd")} ${selectedTime}`,
-            _template: "table",
-            _url: window.location.origin,
-            预约编号: nextBookingId,
-            申请人: applicantName.trim(),
-            预约日期: format(selectedDate, "yyyy-MM-dd"),
-            预约时间: selectedTime,
-            约会计划: activityLabel,
-            悄悄话: note.trim() || "没有留言",
-          }),
-        });
-        if (!fallbackResponse.ok) throw new Error("预约已保存，但通知暂时没有送达。QQ 可以在后台看到它。");
-      }
+      setBookingId(body.booking.code);
       setStep(4);
     } catch (error) {
       setSubmitError(
@@ -341,7 +362,7 @@ export default function Home() {
                 <Sparkles size={26} />
               </span>
               <p className="eyebrow">邀请会好好留在这里</p>
-              <h1>没关系，等你想见 QQ 的时候再来。</h1>
+              <h1 className="opening-question">没关系，等你想见 QQ 的时候再来。</h1>
               <p className="opening-copy">小门不会消失，周末也还会有很多个。</p>
               <button
                 className="primary-button"
@@ -401,19 +422,25 @@ export default function Home() {
                   <span>{selectedDate ? dateLabel : "先在日历里选一天"}</span>
                 </div>
                 {selectedDate ? (
+                  slotsLoading ? (
+                    <p className="tiny-note">正在看看哪些时间还空着…</p>
+                  ) : (
                   <div className="time-grid">
-                    {slots.map((slot) => (
+                    {slotOptions.map((slot) => (
                       <button
-                        key={slot}
-                        className={selectedTime === slot ? "time-option selected" : "time-option"}
+                        key={slot.time}
+                        className={selectedTime === slot.time ? "time-option selected" : "time-option"}
                         type="button"
-                        aria-pressed={selectedTime === slot}
-                        onClick={() => setSelectedTime(slot)}
+                        disabled={!slot.available}
+                        title={slot.available ? undefined : slot.reason}
+                        aria-pressed={selectedTime === slot.time}
+                        onClick={() => setSelectedTime(slot.time)}
                       >
-                        {slot}
+                        {slot.time}
                       </button>
                     ))}
                   </div>
+                  )
                 ) : null}
               </div>
 
@@ -450,6 +477,18 @@ export default function Home() {
                   autoComplete="nickname"
                   placeholder="方便 QQ 知道是谁来约我"
                   onChange={(event) => setApplicantName(event.target.value)}
+                />
+              </label>
+
+              <label className="field-label applicant-field">
+                <span>你的邮箱 <small>必填，用于接收同意或拒绝通知</small></span>
+                <input
+                  type="email"
+                  value={applicantEmail}
+                  maxLength={120}
+                  autoComplete="email"
+                  placeholder="name@example.com"
+                  onChange={(event) => setApplicantEmail(event.target.value)}
                 />
               </label>
 
@@ -503,6 +542,7 @@ export default function Home() {
                 type="button"
                 disabled={
                   !applicantName.trim() ||
+                  !applicantEmail.trim() ||
                   !activityId ||
                   (activityId === "other" && !otherPlan.trim())
                 }
@@ -530,6 +570,10 @@ export default function Home() {
                 <div>
                   <span>申请人</span>
                   <strong>{applicantName}</strong>
+                </div>
+                <div>
+                  <span>通知邮箱</span>
+                  <strong>{applicantEmail}</strong>
                 </div>
                 <div>
                   <span>日期</span>

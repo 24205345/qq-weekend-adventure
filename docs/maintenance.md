@@ -2,17 +2,20 @@
 
 ## 1. 技术概览
 
-项目是一个基于 React、Next.js 和 vinext 的单页应用，托管在 OpenAI Sites。
+项目是一个基于 React、Next.js 和 vinext 的**个人邀请站**。多商户 SaaS 已迁到同级目录 `../qq-weekend-adventure-saas`（见 `docs/saas-migration.md`）。
 
 | 模块 | 用途 |
 | --- | --- |
-| `app/page.tsx` | 全部页面步骤、状态、日期规则、提交和邀请函功能 |
+| `app/page.tsx` | 个人邀请：步骤、状态、日期规则、提交和邀请函 |
+| `lib/personal-booking.ts` | 通知 QQ 的 FormSubmit 邮件 |
+| `lib/personal-data.ts` / `personal-mail.ts` / `personal-auth.ts` | 个人预约、档期、预约人反馈邮件、轻后台登录 |
+| `/my-admin` | 个人轻后台：同意/拒绝/关时段 |
 | `app/globals.css` | 响应式布局、日历和童话视觉样式 |
 | `app/layout.tsx` | 页面元信息和全局布局 |
 | `public/wonderland-garden.png` | 主背景图 |
 | `public/og.png` | 社交分享预览图 |
-| `.openai/hosting.json` | OpenAI Sites 项目标识 |
-| `tests/rendered-html.test.mjs` | 构建产物的基础检查 |
+| `.openai/hosting.json` | 旧 OpenAI Sites 标识（**已不可再发布**） |
+| `tests/rendered-html.test.mjs` | 构建/源码基础检查 |
 
 主要依赖：
 
@@ -37,7 +40,7 @@ const WEEKEND_SLOTS = ["10:30", "13:00", "15:30", "18:00", "20:30"];
 
 ## 3. 邮件通知
 
-浏览器直接向以下 FormSubmit AJAX 地址发送 JSON：
+浏览器直接向以下 FormSubmit AJAX 地址发送 JSON（实现见 `lib/personal-booking.ts`）：
 
 ```text
 https://formsubmit.co/ajax/18096095446@163.com
@@ -64,6 +67,12 @@ https://formsubmit.co/ajax/18096095446@163.com
 当前邮箱地址存在前端代码中，因此任何访问网站的人都能从网络请求中看到它。若未来需要隐藏邮箱、加强防滥用或保存预约，应改为服务端接口，并使用环境变量保存收件地址。
 
 ## 4. 本地开发与验证
+
+### 一键启动（Windows）
+
+双击根目录 `start-local.bat`，或执行 `npm run local`。逻辑在 `scripts/start-local.ps1`：检查 Node `>=22.13.0`、按需 `npm install`、再 `npm run dev`，并延迟打开本地地址。详见 [本地一键启动说明](local-start.md)。
+
+### 手动启动
 
 安装依赖并启动：
 
@@ -95,20 +104,17 @@ npm run lint
 
 ## 5. 发布流程
 
-公开站点：
+### 旧 OpenAI Sites（已废弃为发布通道）
 
 ```text
 https://qq-weekend-adventure.qianqianwang1099.chatgpt.site
 ```
 
-OpenAI Sites 项目标识记录在 `.openai/hosting.json`。正常更新流程为：
+该地址依赖 Codex / OpenAI Sites 控制面。脱离该环境后**无法可靠保存并发布新版本**。`.openai/hosting.json` 仅作历史记录；不要把它当成可恢复的上线入口。旧站若仍可打开，只可当临时过渡，对外请改用新托管地址。
 
-1. 修改并本地验证。
-2. 提交 Git 变更。
-3. 推送到 GitHub 的 `main` 分支。
-4. 构建可部署产物并保存新的 Sites 版本。
-5. 将该版本发布到现有公开站点。
-6. 检查部署状态成功后，再打开线上地址确认。
+### 个人站新托管（待选定）
+
+推荐：Cloudflare Pages / Workers，或 Vercel。选定后把正式 URL 写回 README，并停止分享旧 Sites 链接。上线清单见 `docs/plan1-personal-split.md`。
 
 GitHub 远程仓库：
 
@@ -124,13 +130,13 @@ git commit -m "描述本次修改"
 git push origin main
 ```
 
-GitHub 推送不会自动更新公开网站；Sites 仍需要单独保存并发布新版本。
+GitHub 推送**不会**更新旧 Sites 站点。
 
 ## 6. 回滚与安全
 
 - 发布前保留清晰的小提交，出现问题时优先修复后重新发布。
-- 不要删除 `.openai/hosting.json` 或更改其中的 `project_id`，否则可能发布成另一个站点。
+- 旧 Sites 的 `project_id` 已不可作为正式发布依据；迁移到自有托管后以新项目配置为准。
 - 不要把密码、邮箱授权码或 API 密钥提交到仓库。
 - 不要直接覆盖用户尚未提交的本地修改。
-- 如需更换收件邮箱，修改邮件端点后必须完成新邮箱的 FormSubmit 激活，并进行一次真实提交测试。
+- 如需更换收件邮箱，修改 `lib/personal-booking.ts` 中的地址后必须完成 FormSubmit 激活，并进行一次真实提交测试。
 

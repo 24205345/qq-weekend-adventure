@@ -459,6 +459,12 @@ h2 {
   color: #fff;
 }
 
+.time-option:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
 .wide-button {
   width: 100%;
   margin-top: 16px;

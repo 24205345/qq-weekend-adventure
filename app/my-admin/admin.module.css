@@ -1,0 +1,216 @@
+.shell {
+  --ink: #1d2b26;
+  --muted: #66736c;
+  --line: #d7e0db;
+  --brand: #315f54;
+  --danger: #a43d45;
+  --bg: #f3f6f4;
+  min-height: 100svh;
+  padding: 24px 16px 48px;
+  background:
+    radial-gradient(circle at top left, rgba(181, 75, 98, 0.08), transparent 40%),
+    linear-gradient(180deg, #eef3f0, var(--bg));
+  color: var(--ink);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.header,
+.panelHead,
+.cardTop,
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header {
+  width: min(920px, 100%);
+  margin: 0 auto 18px;
+}
+
+.header h1,
+.loginCard h1,
+.panel h2 {
+  margin: 4px 0;
+  font-family: "Songti SC", "STSong", serif;
+}
+
+.kicker {
+  margin: 0;
+  color: #b54b62;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.muted {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.loginCard,
+.panel {
+  width: min(920px, 100%);
+  margin: 0 auto 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 30px rgba(29, 43, 38, 0.06);
+}
+
+.loginCard {
+  width: min(420px, 100%);
+  margin-top: 12vh;
+  display: grid;
+  gap: 12px;
+}
+
+.loginCard label,
+.panel label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.loginCard input,
+.panel input,
+.panel select {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #cfdad4;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.loginCard button,
+.actions button,
+.ghost {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--brand);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--brand);
+  border: 1px solid #b7c8c0;
+}
+
+.danger {
+  background: #fff !important;
+  color: var(--danger) !important;
+  border: 1px solid #e1b8bb !important;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfb;
+}
+
+.card p {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.cardTop em {
+  font-style: normal;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e8f2ed;
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px !important;
+  color: #4d5c55;
+}
+
+.actions {
+  margin-top: 12px;
+  justify-content: flex-start;
+}
+
+.slotGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.slotOpen,
+.slotClosed {
+  min-height: 72px;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.slotOpen {
+  border: 1px solid #b7cfc4;
+  background: #f3faf6;
+  color: var(--brand);
+}
+
+.slotClosed {
+  border: 1px solid #e0c4c7;
+  background: #fff6f6;
+  color: var(--danger);
+}
+
+.slotOpen small,
+.slotClosed small {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.success,
+.error {
+  width: min(920px, 100%);
+  margin: 0 auto 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.success {
+  background: #edf8f2;
+  color: #246044;
+}
+
+.error {
+  background: #fff1f1;
+  color: #9c3434;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
