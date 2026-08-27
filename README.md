@@ -4,7 +4,7 @@
 
 - 旧线上地址（OpenAI Sites，**已不可再发布，勿再依赖**）：https://qq-weekend-adventure.qianqianwang1099.chatgpt.site
 - GitHub 仓库：https://github.com/24205345/qq-weekend-adventure
-- 当前状态：个人邀请站独立维护；多商户 SaaS 已迁到同级目录 `../qq-weekend-adventure-saas`
+- 当前状态：个人邀请站独立维护；SaaS 已迁到 [qq-weekend-adventure-saas](https://github.com/24205345/qq-weekend-adventure-saas)
 
 ## 已实现功能
 
@@ -26,7 +26,7 @@
 | `lib/personal-*` | 个人业务逻辑 |
 | `docs/personal-light-admin.md` | 轻后台设计 |
 
-多商户预约 SaaS 已物理迁出，见 **`G:\project\qq-weekend-adventure-saas`**。
+多商户预约 SaaS 已物理迁出，见 **[qq-weekend-adventure-saas](https://github.com/24205345/qq-weekend-adventure-saas)**。
 
 ## 本地运行
 

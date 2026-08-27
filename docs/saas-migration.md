@@ -40,7 +40,11 @@
 | 迁移 | `drizzle/0000_normal_chat.sql`（多商户） |
 | 示例 | `examples/` |
 
-### SaaS 本地副本（`G:\project\qq-weekend-adventure-saas`）
+### SaaS 独立仓库
+
+**GitHub：** https://github.com/24205345/qq-weekend-adventure-saas
+
+**本地路径（可选）：** `G:\project\qq-weekend-adventure-saas`
 
 **包含：**
 
@@ -55,7 +59,7 @@
 - `/my-admin`、`/api/personal/`、`lib/personal-*`
 - 个人文档、`start-local.bat`、`env.example`
 
-> **注意：** SaaS 目录当前**未初始化 Git**，仅存在于本机。若需上 GitHub，需单独 `git init` 并创建远程仓库。
+> **注意：** SaaS 已推送到 GitHub 独立仓库（见上）。本地目录可与远程仓库同步使用。
 
 ## 3. 操作清单（已完成）
 
@@ -64,7 +68,7 @@
 - [x] 新增个人轻后台与 `/api/personal`
 - [x] 复制并清理 `qq-weekend-adventure-saas` 目录
 - [x] 更新 README、测试、维护文档
-- [x] 新增 [architecture.md](architecture.md)
+- [x] 初始化并推送 SaaS 仓库到 GitHub
 
 ## 4. 后续建议
 
@@ -74,10 +78,10 @@
 2. 配置 `env.example` 中的 Resend 与管理员密码  
 3. 停止对外分享旧 `chatgpt.site` 链接  
 
-### SaaS（本地副本）
+### SaaS（独立仓库）
 
-1. 在 `qq-weekend-adventure-saas` 执行 `npm install`  
-2. 如需远程备份：`git init` → 新建 GitHub 仓库 → push  
+1. 克隆 https://github.com/24205345/qq-weekend-adventure-saas  
+2. `npm install` 后本地开发  
 3. 配置 D1 + ChatGPT 登录后再考虑上线  
 
 ## 5. 两项目协作边界

@@ -2,7 +2,7 @@
 
 ## 1. 技术概览
 
-项目是一个基于 React、Next.js 和 vinext 的**个人邀请站**。多商户 SaaS 已迁到同级目录 `../qq-weekend-adventure-saas`（见 `docs/saas-migration.md`）。
+项目是一个基于 React、Next.js 和 vinext 的**个人邀请站**。多商户 SaaS 已迁到独立仓库 [qq-weekend-adventure-saas](https://github.com/24205345/qq-weekend-adventure-saas)（见 `docs/saas-migration.md`）。
 
 | 模块 | 用途 |
 | --- | --- |
